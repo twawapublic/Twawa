@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Twawa 2.0</title>
+
+  <style>
+    @font-face {
+      font-family: 'Minecraftia';
+      src: url('fonts/Minecraftia.woff') format('woff');
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #1a1a1a;
+    }
+
+    .navbar {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 2;
+    }
+
+    .navbar ul {
+      display: flex;
+      gap: 20px;
+      list-style-type: none;
+    }
+
+    .navbar a {
+      color: white;
+      text-decoration: none;
+      font-family: 'Minecraftia', sans-serif;
+      font-size: 1.5em; /* ナビゲーションのフォントサイズ */
+      cursor: pointer;
+    }
+
+    .title-container {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 2;
+      opacity: 0; /* 初期の透明度を設定 */
+      transform: translateY(-20px); /* 初期位置を上に設定 */
+      transition: opacity 0.8s, transform 0.8s; /* アニメーションのトランジションを設定 */
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.7); /* ぼかしのエフェクト */
+    }
+
+    .title {
+      font-family: 'Minecraftia', sans-serif;
+      font-size: 2em; /* タイトルのサイズを調整 */
+      margin: 0; /* マージンをリセット */
+    }
+
+    .container {
+      text-align: center;
+      z-index: 2;
+      opacity: 0; /* 初期の透明度を設定 */
+      transform: translateY(20px); /* 初期位置を下に設定 */
+      transition: opacity 0.8s, transform 0.8s; /* アニメーションのトランジションを長く設定 */
+    }
+
+    .long-separator {
+      width: 100%; /* 常に全幅に設定 */
+      height: 4px;
+      background-color: white;
+      margin: 10px 0; /* 上下の余白を追加 */
+      opacity: 0; /* 初期の透明度を設定 */
+      transform: scaleY(0); /* 初期スケールを0に設定 */
+      transition: opacity 0.8s, transform 0.8s; /* アニメーションのトランジションを設定 */
+      position: absolute; /* 絶対位置に設定 */
+      top: 70px; /* ナビゲーションバーの下に配置 */
+      left: 0; /* 左端に配置 */
+    }
+
+    .section-separator {
+      width: 100%; /* 常に全幅に設定 */
+      height: 2px;
+      background-color: white;
+      margin: 10px 0; /* 上下の余白を追加 */
+      opacity: 0; /* 初期の透明度を設定 */
+      transform: scaleY(0); /* 初期スケールを0に設定 */
+      transition: opacity 0.8s, transform 0.8s; /* アニメーションのトランジションを設定 */
+      margin-top: 20px; /* タイトルの下に間隔を追加 */
+    }
+
+    .button-group {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1.2em;
+      font-family: 'Minecraftia', sans-serif;
+      text-decoration: none;
+      color: white;
+      cursor: pointer;
+    }
+
+    .buy-btn {
+      background-color: #4CAF50;
+    }
+
+    .discord-btn {
+      background-color: #7289DA;
+    }
+
+    .btn:hover {
+      opacity: 0.8;
+    }
+
+    .background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('background.jpg');
+      background-size: cover;
+      filter: blur(5px);
+      z-index: 1;
+    }
+
+    .product-container {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      z-index: 2;
+    }
+
+    .image-container {
+      position: relative;
+      border: 5px solid rgba(255, 255, 255, 0.5);
+      border-radius: 10px;
+      padding: 10px;
+    }
+
+    .image-container img {
+      width: 300px;
+      border-radius: 5px;
+    }
+
+    .description-container {
+      background-color: rgba(255, 255, 255, 0.2);
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 400px;
+    }
+
+    /* 更新情報リストのスタイル */
+    .update-list {
+      list-style-type: none; /* デフォルトのリストスタイルを無効化 */
+      padding: 0; /* パディングをリセット */
+      text-align: left; /* 左揃え */
+      border: 2px solid white; /* 枠線を追加 */
+      padding: 20px; /* 内側の余白 */
+      border-radius: 10px; /* 角を丸める */
+      margin: 20px auto; /* 上下の余白を追加 */
+      background-color: rgba(255, 255, 255, 0.1); /* 背景色を追加 */
+    }
+
+    .update-list li {
+      position: relative; /* 相対位置を設定 */
+      margin: 10px 0; /* 各アイテムの上下に余白 */
+      padding-left: 20px; /* 左の余白を設定 */
+    }
+
+    .update-list li::before {
+      content: ''; /* 擬似要素を作成 */
+      position: absolute; /* 絶対位置を設定 */
+      left: 0; /* 左側に配置 */
+      top: 50%; /* 縦中央に配置 */
+      width: 5px; /* 線の幅 */
+      height: 100%; /* 高さを100%に */
+      background-color: white; /* 線の色 */
+      transform: translateY(-50%); /* 縦中央に配置調整 */
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <ul>
+      <li><a href="#" onclick="navigateTo('home')">Home</a></li>
+      <li><a href="#" onclick="navigateTo('tool')">Tool</a></li>
+      <li><a href="#" onclick="navigateTo('info')">Announce</a></li>
+    </ul>
+  </nav>
+  
+  <div class="title-container" id="title-container">
+    <h1 class="title">Twawa2.0</h1>
+  </div>
+
+  <div id="long-separator" class="long-separator"></div> <!-- ナビゲーションの下に長い線を配置 -->
+  
+  <div class="background"></div>
+  
+  <div id="content" class="container">
+    <!-- 初期表示のHomeページ -->
+  </div>
+
+  <script>
+    // 初期内容を表示
+    function displayInitialContent() {
+      const titleContainer = document.getElementById('title-container');
+      titleContainer.style.opacity = 1; // 透明度を1に戻す
+      titleContainer.style.transform = 'translateY(0)'; // 元の位置に戻す
+
+      const content = document.getElementById('content');
+      content.innerHTML = `
+        <h1 class="title">TwawaPublic 2.0</h1>
+        <div class="section-separator" id="section-separator-home"></div>
+        <p>Best Youtube,Other MultiBoosterTool</p>
+        <div class="button-group">
+          <a href="https://discord.gg/69BPfs5ZWx" class="btn buy-btn">Buy</a>
+          <a href="https://discord.gg/69BPfs5ZWx" class="btn discord-btn">Discord</a>
+        </div>
+      `;
+
+      // アニメーションを実行
+      content.style.opacity = 1; // 透明度を1に戻す
+      content.style.transform = 'translateY(0)'; // 元の位置に戻す
+
+      // 長い線のアニメーションを実行
+      const longSeparator = document.getElementById('long-separator');
+      longSeparator.style.opacity = 1; // 透明度を1に戻す
+      longSeparator.style.transform = 'scaleY(1)'; // スケールを元に戻す
+    }
+
+    // ページ遷移の処理
+    function navigateTo(page) {
+      const content = document.getElementById('content');
+      content.style.opacity = 0; // 透明度を0にする
+      content.style.transform = 'translateY(20px)'; // 下に移動
+
+      // ナビゲーションの長い線を保持
+      const longSeparator = document.getElementById('long-separator');
+      longSeparator.style.opacity = 0; // 透明度を0にする
+
+      // セクションの線を非表示
+      const sectionSeparators = document.querySelectorAll('.section-separator');
+      sectionSeparators.forEach(separator => {
+        separator.style.opacity = 0; // 透明度を0にする
+      });
+
+      // ページ遷移を待つ
+      setTimeout(() => {
+        if (page === 'home') {
+          content.innerHTML = `
+            <h4 class="title">TwawaPublic 2.0</h4>
+            <div class="section-separator" id="section-separator-home"></div>
+            <p>Best Youtube,Other MultiBoosterTool</p>
+            <div class="button-group">
+              <a href="https://discord.gg/69BPfs5ZWx" class="btn buy-btn">Buy🛒</a>
+              <a href="https://discord.gg/69BPfs5ZWx" class="btn discord-btn">Discord💬</a>
+            </div>
+          `;
+        } else if (page === 'tool') {
+          content.innerHTML = `
+            <h1 class="title">Tool</h1>
+            <div class="section-separator" id="section-separator-tool"></div>
+            <div class="product-container">
+              <div class="image-container">
+                <img src="C:\\Users\\twawa\\Downloads\\a\\tool.png" alt="Product Image">
+              </div>
+              <div class="description-container">
+  <p>Tool description:</p>
+  <ul class="bullet-list">
+    <li>Put Key to boost</li>
+    <li>Easy to Use</li>
+    <li>Clean Gui</li>
+    <li>WTF Speed</li>
+    <li>Cheap</li>
+  </ul>
+</div>
+
+          `;
+        } else if (page === 'info') {
+          content.innerHTML = `
+            <h1 class="title">Announce</h1>
+            <div class="section-separator" id="section-separator-info"></div>
+            <ul class="update-list">
+              <li>2024/11/10 | Updated to 2.2</li>
+              <li>2024/11/10 | Chanhed Gui </li>
+              <li>2024/11/10 | Fixed Error Bug ( req bug )</li>
+              <li>2024/11/10 | Fixed GeneralProxy Error</li>
+              <li>2024/11/10 | Fixed the big row order</li>
+              <li>2024/11/10 | Add Custom Bar</li>
+              <li>2024/11/10 | Delete Font Selector</li>
+              <li>2024/11/10 | Changed Text Font to Minecraftia</li>
+            </ul>
+          `;
+        }
+
+        // アニメーションを再実行するための設定
+        content.offsetHeight; // リフローをトリガー
+        content.style.opacity = 1; // 透明度を1に戻す
+        content.style.transform = 'translateY(0)'; // 元の位置に戻す
+
+        // 長い線のアニメーションを再実行するための設定
+        longSeparator.offsetHeight; // リフローをトリガー
+        longSeparator.style.opacity = 1; // 透明度を1に戻す
+        longSeparator.style.transform = 'scaleY(1)'; // スケールを元に戻す
+
+        // セクションの線のアニメーションを再実行するための設定
+        const sectionSeparator = document.getElementById(`section-separator-${page}`);
+        sectionSeparator.offsetHeight; // リフローをトリガー
+        sectionSeparator.style.opacity = 1; // 透明度を1に戻す
+        sectionSeparator.style.transform = 'scaleY(1)'; // スケールを元に戻す
+      }, 500); // 透明度を0にしてから500ms待つ
+    }
+
+    // ページが読み込まれたときに初期内容を表示
+    window.onload = displayInitialContent;
+  </script>
+</body>
+</html>
